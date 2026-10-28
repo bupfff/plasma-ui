@@ -33,10 +33,10 @@ p { margin: .5rem 0 0; }
 a { color: inherit; }
 code, pre { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: .86em; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
-section { margin-top: 140px; }
-.section-lede { max-width: 66ch; color: var(--muted); margin: 1rem 0 2rem; }
-.note { max-width: 70ch; color: var(--muted); margin-top: 1.5rem; font-size: .95rem; }
-.code + .note { margin-top: 2rem; }
+section { margin-top: 104px; }
+.section-lede { max-width: 66ch; color: var(--muted); margin: 1rem 0 1.5rem; }
+.note { max-width: 70ch; color: var(--muted); margin-top: 1rem; font-size: .95rem; }
+.code + .note { margin-top: 1.5rem; }
 .note code { background: var(--code); padding: .1em .35em; border-radius: 6px; }
 
 /* nav */
@@ -52,11 +52,6 @@ section { margin-top: 140px; }
 .nav-links { display: flex; gap: 12px; margin-right: auto; }
 .nav-links a { white-space: nowrap; text-decoration: none; color: var(--muted); font-size: .95rem; }
 .nav-links a:hover { color: var(--text); }
-/* Repo link: last in the bar, and the one nav item that survives narrow widths. */
-.repo { display: inline-flex; align-items: center; color: var(--muted); text-decoration: none; }
-.repo:hover { color: var(--text); }
-.repo svg { display: block; }
-
 .seg { display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--code); }
 .seg button, .btn {
   font: 500 .9rem Onest, sans-serif; color: var(--text); background: transparent; border: 0; cursor: pointer;
@@ -79,9 +74,6 @@ section { margin-top: 140px; }
 .hero-stack { width: min(672px, 100%); }
 .hero-title { padding: 48px 48px 40px; }
 .lede { font-size: 1.15rem; color: var(--muted); max-width: 44ch; margin-top: 1.25rem; }
-.hero-install { padding: 22px 48px; width: min(504px, 100%); }
-.hero-install code { white-space: nowrap; }
-.hero-install code { font-size: .95rem; }
 .hero-note { color: var(--muted); font-size: .8rem; max-width: 44ch; margin-top: 1.25rem; opacity: .85; }
 
 /* steps: no gaps, so they render as one surface */
@@ -95,6 +87,14 @@ section { margin-top: 140px; }
 .stage {
   position: relative; height: 600px; border-radius: 28px; border: 1px dashed var(--faint);
 }
+.tour-guide {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: 14px 18px; margin-bottom: 12px; border: 1px solid var(--faint); border-radius: 18px;
+  background: var(--code);
+}
+.tour-guide p { color: var(--muted); font-size: .9rem; margin-top: .2rem; }
+.tour-step { font-size: .8rem; color: var(--focus); text-transform: uppercase; letter-spacing: .08em; }
+.tour-guide .btn { flex: 0 0 auto; }
 .plate {
   background: var(--plate-bg, var(--plate));
   border-radius: 16px; border: 1px solid var(--faint);
@@ -108,7 +108,7 @@ section { margin-top: 140px; }
 .stage-bar { display: flex; justify-content: space-between; color: var(--muted); font-size: .85rem; padding: 10px 6px 0; }
 .controls { display: flex; }
 .controls .plate { flex: 1; padding: 16px 18px 14px; }
-.controls h3 { font-size: .95rem; margin-top: 1.4rem; }
+.controls h3 { font-size: .95rem; margin-top: 1.1rem; }
 .controls h3:first-child { margin-top: 0; }
 .field { margin-top: .7rem; }
 .field label { display: flex; justify-content: space-between; font-size: .85rem; color: var(--muted); }
@@ -125,13 +125,13 @@ input[type="range"] { width: 100%; accent-color: var(--text); margin: .3rem 0 0;
 .switch { width: 42px; height: 24px; border-radius: 999px; border: 1px solid var(--faint); background: var(--code); position: relative; cursor: pointer; padding: 0; }
 .switch span { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--muted); transition: transform .2s ease, background .2s ease; }
 .switch[aria-checked="true"] span { transform: translateX(18px); background: var(--text); }
-.code { margin-top: 64px; display: flex; }
+.code { margin-top: 48px; display: flex; }
 .code .plate { flex: 1; padding: 16px 20px; overflow-x: auto; }
 h2 + .code { margin-top: 32px; }
 .code pre { margin: 0; line-height: 1.55; }
 
 /* api */
-.api { margin-top: 64px; display: flex; }
+.api { margin-top: 48px; display: flex; }
 .api .plate { flex: 1; padding: 22px 26px; }
 h2 + .api { margin-top: 32px; }
 .api > p { color: var(--muted); }
@@ -150,7 +150,7 @@ tr:last-child td { border-bottom: 0; }
 .limit p { color: var(--muted); font-size: .9rem; }
 @media (max-width: 900px) { .limits { grid-template-columns: 1fr; } }
 
-.footer { margin-top: 120px; color: var(--muted); font-size: .9rem; }
+.footer { margin-top: 80px; color: var(--muted); font-size: .9rem; }
 
 @media (max-width: 900px) {
   .play { grid-template-columns: 1fr; }
@@ -160,11 +160,11 @@ tr:last-child td { border-bottom: 0; }
   main { padding-top: 100px; }
   .nav .seg button { padding: .35rem .4rem; font-size: .73rem; }
   .nav { gap: 10px; padding-left: 14px; padding-right: 14px; }
-  /* The preset row is the only part of the bar that can give, so it takes the
-     leftover width and scrolls sideways. The wordmark and the repo link keep
-     their size - before this the row simply pushed the repo link off-screen. */
+  /* The preset row takes the leftover width and scrolls; keep the wordmark fixed. */
   .brand { font-size: 1.2rem; }
-  .brand, .repo { flex: 0 0 auto; }
+  .brand { flex: 0 0 auto; }
+  .tour-guide { align-items: flex-start; }
+  .tour-guide .btn { padding-right: 0; }
   .nav .seg {
     flex: 1 1 auto; min-width: 0;
     overflow-x: auto; overscroll-behavior-x: contain;
@@ -173,21 +173,19 @@ tr:last-child td { border-bottom: 0; }
   .nav .seg::-webkit-scrollbar { display: none; }
   .nav .seg button { flex: 0 0 auto; }
   .hero-title { padding: 32px 26px; }
-  .hero-install { padding: 18px 26px; width: 100%; }
-  .hero-install code { white-space: normal; word-break: break-word; font-size: .85rem; }
   .row { flex-wrap: wrap; }
   .stage { height: 720px; }
 }
 
-.demos { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 72px 64px; margin-top: 2rem; }
-.demo h3 { font-size: .95rem; color: var(--muted); font-weight: 500; margin-bottom: 1.2rem; }
-.demo-row { display: flex; align-items: center; flex-wrap: wrap; gap: 56px; margin-bottom: 1.6rem; }
+.demos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 48px; margin-top: 1.5rem; }
+.demo h3 { font-size: .95rem; color: var(--muted); font-weight: 500; margin-bottom: .8rem; }
+.demo-row { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; margin-bottom: 1rem; }
 .demo-value { font-variant-numeric: tabular-nums; color: var(--muted); min-width: 2ch; }
 .demo-row.tight { gap: 16px; }
 
 /* Release highlights stay readable without requiring another WebGL surface. */
 .releases { border-top: 1px solid var(--faint); }
-.release { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 32px; padding: 36px 0; border-bottom: 1px solid var(--faint); }
+.release { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 24px; padding: 28px 0; border-bottom: 1px solid var(--faint); }
 .release-version { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; font-family: "JetBrains Mono", monospace; }
 .release-badge { color: var(--focus); font-size: .75rem; border: 1px solid var(--faint); border-radius: 999px; padding: 2px 10px; }
 .release h3 { font-size: 2rem; scroll-margin-top: 24px; }
@@ -198,6 +196,9 @@ tr:last-child td { border-bottom: 0; }
 .release .release-links { display: flex; flex-wrap: wrap; gap: 12px 24px; list-style: none; padding: 0; margin-top: 1.5rem; font-size: .9rem; }
 .release-links li + li { margin-top: 0; }
 .release-links a { color: var(--text); }
+@media (max-width: 680px) {
+  .demos { grid-template-columns: 1fr; gap: 32px; }
+}
 @media (max-width: 1100px) { .nav-links { display: none; } }
 @media (max-width: 560px) {
   .release { grid-template-columns: minmax(0, 1fr); gap: 16px; }

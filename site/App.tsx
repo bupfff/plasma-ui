@@ -19,6 +19,10 @@ import {
 } from "../src";
 
 type Theme = "auto" | "light" | "dark";
+type BackgroundMode = "field" | "color" | "image";
+const BACKGROUND_IMAGE = "https://cruxgarden.github.io/plasma-ui/og-image.jpg";
+const BACKGROUND_COLOR = "#0b3145";
+
 interface Settings {
   mood: MoodName;
   theme: Theme;
@@ -318,6 +322,13 @@ const PANEL_SEED = [
 export function App() {
   const [s, setS] = useState<Settings>(DEFAULTS);
   const [config, setConfig] = useState<string | null>("Lumen");
+  const [backgroundMode, setBackgroundMode] = useState<BackgroundMode>("field");
+  const background =
+    backgroundMode === "color"
+      ? BACKGROUND_COLOR
+      : backgroundMode === "image"
+        ? BACKGROUND_IMAGE
+        : undefined;
   const set = <K extends keyof Settings>(k: K, v: Settings[K]) => {
     setConfig(null);
     setS((p) => ({ ...p, [k]: v }));
@@ -336,6 +347,7 @@ export function App() {
 
   return (
     <PlasmaProvider
+      background={background}
       mood={s.mood}
       theme={s.theme}
       freezeOnScroll={FREEZE_ON_SCROLL}
@@ -378,9 +390,12 @@ export function App() {
         <Playground
           s={s}
           set={set}
+          backgroundMode={backgroundMode}
+          setBackgroundMode={setBackgroundMode}
           reset={() => {
             setS(DEFAULTS);
             setConfig("Lumen");
+            setBackgroundMode("field");
           }}
         />
         <Components />
@@ -430,27 +445,6 @@ function Nav({
           </button>
         ))}
       </div>
-      <a
-        className="repo"
-        href="https://github.com/CruxGarden/plasma-ui"
-        target="_blank"
-        rel="noreferrer"
-        title="Plasma UI on GitHub"
-        aria-label="Plasma UI on GitHub"
-      >
-        <svg
-          viewBox="0 0 16 16"
-          width="20"
-          height="20"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <path
-            fill="currentColor"
-            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
-          />
-        </svg>
-      </a>
     </nav>
   );
 }
@@ -486,9 +480,6 @@ function Hero() {
             GPU-heavy and does not run well on mobile.
           </p>
         </Plasma>
-        <Plasma className="hero-install" radius={36}>
-          <code>npm install @cruxgarden/plasma-ui</code>
-        </Plasma>
       </div>
     </section>
   );
@@ -497,10 +488,14 @@ function Hero() {
 function Playground({
   s,
   set,
+  backgroundMode,
+  setBackgroundMode,
   reset,
 }: {
   s: Settings;
   set: <K extends keyof Settings>(k: K, v: Settings[K]) => void;
+  backgroundMode: BackgroundMode;
+  setBackgroundMode: (mode: BackgroundMode) => void;
   reset: () => void;
 }) {
   const stage = useRef<HTMLDivElement>(null);
@@ -508,6 +503,12 @@ function Playground({
   const [count, setCount] = useState(5);
   const [offsets, setOffsets] = useState<Offset[]>([]);
   const [joined, setJoined] = useState<boolean[]>([]);
+  const [didDrag, setDidDrag] = useState(false);
+  const [didJoin, setDidJoin] = useState(false);
+  const [didPulse, setDidPulse] = useState(false);
+  const lastDraggedPanel = useRef<number | null>(null);
+  const joinState = useRef<boolean[]>([]);
+  const tourStep = !didDrag ? 0 : !didJoin ? 1 : !didPulse ? 2 : 3;
 
   const cols = () =>
     Math.max(
@@ -582,13 +583,17 @@ function Playground({
       .map((k) =>
         typeof s[k] === "string" ? `${k}="${s[k]}"` : `${k}={${s[k]}}`,
       );
+    if (backgroundMode === "color")
+      props.push(`background="${BACKGROUND_COLOR}"`);
+    if (backgroundMode === "image")
+      props.push(`background="${BACKGROUND_IMAGE}"`);
     const theme = s.theme !== "auto" ? [`theme="${s.theme}"`] : [];
     if (s.rimStyle !== "iridescent") theme.push(`rimColor="${rimColorOf(s)}"`);
     const panelProps = s.panelColors
       ? ` tint="${PANEL_COLORS[0]}" opacity={${Math.max(s.opacity, 0.35)}}`
       : "";
     return `<PlasmaProvider ${[...props, ...theme].join(" ")}>\n  <Plasma draggable bounds={stageRef}${panelProps}>\n    <h3>Inbox</h3>\n  </Plasma>\n</PlasmaProvider>`;
-  }, [s]);
+  }, [s, backgroundMode]);
 
   const joinedCount = joined.slice(0, count).filter(Boolean).length;
 
@@ -596,17 +601,49 @@ function Playground({
     <section id="playground">
       <h2>Playground</h2>
       <p className="section-lede">
-        Drag panels; they fuse on contact and snap to the grid on release. Throw
-        one to stretch the plasma. Click empty space to send a pulse. The
-        controls change the whole page.
+        A workspace made of liquid surfaces. Drag a panel to move it, bring two
+        together to fuse them, or click the open canvas to send a pulse. Changes
+        here update the whole page.
       </p>
       <div className="play">
         <div className="stage-wrap">
+          <div className="tour-guide">
+            <div role="status" aria-live="polite">
+              <span className="tour-step">
+                {tourStep === 3
+                  ? "Guide complete"
+                  : `Step ${tourStep + 1} of 3`}
+              </span>
+              <p>
+                {tourStep === 0
+                  ? "Drag any workspace panel to feel it stretch and settle."
+                  : tourStep === 1
+                    ? "Join two separate panels (pull one away first if needed)."
+                    : tourStep === 2
+                      ? "Click an empty spot in the canvas to send a pulse."
+                      : "You’ve tried the core interactions. Explore the controls or replay the guide."}
+              </p>
+            </div>
+            <button
+              className="btn subtle"
+              onClick={() => {
+                lastDraggedPanel.current = null;
+                setDidDrag(false);
+                setDidJoin(false);
+                setDidPulse(false);
+              }}
+            >
+              Restart guide
+            </button>
+          </div>
           <div
             ref={stage}
             className="stage"
             onPointerDown={(e) => {
-              if (e.target === e.currentTarget) pulse(e.clientX, e.clientY, 1);
+              if (e.target === e.currentTarget) {
+                pulse(e.clientX, e.clientY, 1);
+                setDidPulse(true);
+              }
             }}
           >
             {PANEL_SEED.slice(0, count).map((p, i) => (
@@ -614,18 +651,26 @@ function Playground({
                 key={p.title}
                 className="panel"
                 draggable
+                onDragStart={() => {
+                  lastDraggedPanel.current = i;
+                }}
                 bounds={stage}
                 offset={offsets[i]}
-                onDragEnd={(o) =>
-                  setOffsets((prev) => prev.map((v, j) => (j === i ? o : v)))
-                }
-                onJoinChange={(j) =>
+                onDragEnd={(o) => {
+                  setOffsets((prev) => prev.map((v, j) => (j === i ? o : v)));
+                  setDidDrag(true);
+                }}
+                onJoinChange={(j) => {
                   setJoined((prev) => {
                     const n = [...prev];
                     n[i] = j;
                     return n;
-                  })
-                }
+                  });
+                  const wasJoined = joinState.current[i];
+                  joinState.current[i] = j;
+                  if (lastDraggedPanel.current === i && j && wasJoined !== true)
+                    setDidJoin(true);
+                }}
                 tint={s.panelColors ? PANEL_COLORS[i] : undefined}
                 opacity={s.panelColors ? Math.max(s.opacity, 0.35) : undefined}
                 padding={20}
@@ -650,7 +695,7 @@ function Playground({
           </div>
           <div className="stage-bar">
             <span>
-              {count} panels, {joinedCount} joined
+              Workspace · {count} panels, {joinedCount} joined
             </span>
             <span>{s.grid}px grid</span>
           </div>
@@ -687,6 +732,17 @@ function Playground({
                 Remove panel
               </button>
             </div>
+
+            <h3>Background</h3>
+            <Select
+              label="Source"
+              value={backgroundMode}
+              options={["field", "color", "image"]}
+              onChange={(v) => setBackgroundMode(v as BackgroundMode)}
+            />
+            <p className="control-note">
+              Compare the procedural field with a solid color or an image.
+            </p>
 
             <h3>Motion</h3>
             <Slider

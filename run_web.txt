@@ -1,3 +1,6 @@
 npm install
 npm run build:site
 npx serve site/dist
+
+npm run build:site
+python3 -m http.server 8000 --directory site/dist
