@@ -1,16 +1,12 @@
 # Plasma UI
 
-Liquid components for React, rendered in WebGL on canvas, inspired by Apple's Liquid Glass design. The `<Plasma>` panel looks and behaves like liquid, with surface tension that fuses on contact with other panels. Anything visible behind the panel is refracted. And for layout convenience, the panels ultimately snap to a grid layout. The library is a work in progress, extracted from the [Crux Garden](https://github.com/cruxgarden) project, but it seemed useful enough to share in its current form.
+Liquid components for React, rendered in WebGL on canvas, inspired by Apple's Liquid Glass design. The `<Plasma>` panel looks and behaves like liquid, with surface tension that fuses on contact with other panels. Anything visible behind the panel is refracted. And for layout convenience, the panels ultimately snap to a grid layout. The library is a work in progress.
 
 ![Five panels in a workspace: one is dragged out of its group and travels as liquid, another is dropped against a neighbour and fuses into it, and each snaps to the 24px grid](docs/demo.gif)
 
-[Playground and Docs](https://cruxgarden.github.io/plasma-ui/) · [Workspace example](https://cruxgarden.github.io/plasma-ui/examples/workspace/) · [Changelog](https://cruxgarden.github.io/plasma-ui/#changelog)
 
-**Status: pre-1.0.** Core is tested, but the API may change. See the [changelog](https://cruxgarden.github.io/plasma-ui/#changelog) for current features and upgrade notes.
+**Status: pre-1.0.** Core is tested, but the API may change. 
 
-```bash
-npm install @cruxgarden/plasma-ui
-```
 
 Zero dependencies, except for React. Best on desktop: the effect is GPU-heavy
 and does not run well on mobile.
@@ -370,15 +366,8 @@ from disk. `scripts/build-page.mjs` is the one builder they share.
 
 Pushing to `main` deploys `npm run build:pages` to GitHub Pages:
 
-- Site: https://cruxgarden.github.io/plasma-ui/
-- Workspace example: https://cruxgarden.github.io/plasma-ui/examples/workspace/
-
 Releases go to npm from a local machine, the same way the Crux Garden CLI
 does — see [PUBLISH.md](PUBLISH.md).
-
-## Used by
-
-- [Crux Garden](https://github.com/cruxgarden) - the project Plasma UI was originally built for.
 
 Using it in something? Add yours in a PR.
 
@@ -391,8 +380,6 @@ Contributions are welcome - bug reports, fixes, and roadmap features alike.
 3. Rebuild the docs site (`npm run build:site`) and click through the five nav configurations - it's the integration test.
 4. For visual changes, include before/after screenshots in the PR.
 5. Open a pull request with a short description of what changed and why.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the code layout and a list of known gaps that make good first projects. By contributing, you agree that your contributions will be licensed under the MIT license.
 
 ## Acknowledgements
 
